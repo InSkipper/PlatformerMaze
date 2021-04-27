@@ -51,14 +51,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Domain\Creature.cs" />
+    <Compile Include="Domain\Player.cs" />
     <Compile Include="Domain\Direction.cs" />
     <Compile Include="Domain\Game.cs" />
     <Compile Include="Domain\GameStage.cs" />
     <Compile Include="Domain\Map.cs" />
-    <Compile Include="Domain\Platform.cs" />
-    <Compile Include="Domain\PlatformType.cs" />
-    <Compile Include="Domain\Point.cs" />
+    <Compile Include="Domain\Block.cs" />
+    <Compile Include="Domain\TileType.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
