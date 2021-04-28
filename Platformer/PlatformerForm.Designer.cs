@@ -1,7 +1,7 @@
 ﻿
 namespace Platformer
 {
-    partial class Form1
+    partial class PlatformerForm
     {
         /// <summary>
         /// Обязательная переменная конструктора.
@@ -31,13 +31,13 @@ namespace Platformer
         {
             this.SuspendLayout();
             // 
-            // Form1
+            // PlatformerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Name = "Form1";
-            this.Text = "Form1";
+            this.Name = "PlatformerForm";
+            this.Text = "Здесь может быть ваша реклама";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
 

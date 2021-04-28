@@ -1,4 +1,6 @@
-﻿namespace Platformer.Domain
+﻿using System.Drawing;
+
+namespace Platformer.Domain
 {
     public class Block
     {

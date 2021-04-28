@@ -2,13 +2,19 @@
 {
     public class Player
     {
-        public float PosX = 0;
-        public float PosY = 0;
+        public float PosX;
+        public float PosY;
         public float VelocityX = 0;
         public float VelocityY = 0;
         private const float MaxVelocityX = 10f;
         private const float MaxVelocityY = 100f;
         private float deltaTime = 1 / 60f;
+
+        public Player(int posX, int posY)
+        {
+            PosX = posX;
+            PosY = posY;
+        }
 
         public void MoveHorizontally(float velocity)
         {
@@ -21,21 +27,21 @@
 
             if (velocity <= 0)
             {
-                if (Game.CurrentMap.GetTile(newPosX, PosY) == '#'
-                    || Game.CurrentMap.GetTile(newPosX, PosY + 0.9f) == '#')
+                if (Game.CurrentMap.IsSolid(newPosX, PosY)
+                    || Game.CurrentMap.IsSolid(newPosX, PosY + 0.9f))
                 {
-                    PosX = (int)PosX + 1;
+                    newPosX = (int)newPosX + 1;
                     VelocityX = 0;
                 }
             }
-            else if (Game.CurrentMap.GetTile(newPosX + 1, PosY) == '#'
-                     || Game.CurrentMap.GetTile(newPosX + 1, PosY + 0.9f) == '#')
+            else if (Game.CurrentMap.IsSolid(newPosX + 1, PosY)
+                     || Game.CurrentMap.IsSolid(newPosX + 1, PosY + 0.9f))
             {
-                newPosX = (int)PosX;
+                newPosX = (int)newPosX;
                 VelocityX = 0;
             }
 
-            PosX += newPosX;
+            PosX = newPosX;
         }
 
         public void MoveVertically(float velocity)
@@ -49,21 +55,21 @@
 
             if (velocity <= 0)
             {
-                if (Game.CurrentMap.GetTile(PosX, newPosY) == '#'
-                    || Game.CurrentMap.GetTile(VelocityX + 0.9f, newPosY) == '#')
+                if (Game.CurrentMap.IsSolid(PosX, newPosY)
+                    || Game.CurrentMap.IsSolid(PosX + 0.9f, newPosY))
                 {
-                    PosY = (int)PosY + 1;
+                    newPosY = (int)newPosY + 1;
                     VelocityY = 0;
                 }
             }
-            else if (Game.CurrentMap.GetTile(PosX, newPosY + 1) == '#'
-                     || Game.CurrentMap.GetTile(PosX + 0.9f, newPosY + 1) == '#')
+            else if (Game.CurrentMap.IsSolid(PosX, newPosY + 1)
+                     || Game.CurrentMap.IsSolid(PosX + 0.9f, newPosY + 1))
             {
-                newPosY = (int)PosY;
+                newPosY = (int)newPosY;
                 VelocityY = 0;
             }
 
-            PosY += newPosY;
+            PosY = newPosY;
         }
     }
 }
