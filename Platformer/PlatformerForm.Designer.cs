@@ -37,7 +37,7 @@ namespace Platformer
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Name = "PlatformerForm";
-            this.Text = "Здесь может быть ваша реклама";
+            this.Text = "PlatformerForm";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
 

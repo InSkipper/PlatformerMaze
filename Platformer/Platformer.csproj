@@ -56,7 +56,7 @@
     <Compile Include="Domain\Game.cs" />
     <Compile Include="Domain\GameStage.cs" />
     <Compile Include="Domain\Map.cs" />
-    <Compile Include="Domain\Block.cs" />
+    <Compile Include="Domain\Tile.cs" />
     <Compile Include="Domain\TileType.cs" />
     <Compile Include="PlatformerForm.cs">
       <SubType>Form</SubType>

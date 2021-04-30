@@ -9,29 +9,20 @@ namespace Platformer
 {
     public partial class PlatformerForm : Form
     {
-        private Map map = LoadLevels().First();
+        private readonly Game game = new Game(LoadLevels().First());
         private readonly Timer timer;
+        private readonly Map[] levels = LoadLevels().ToArray();
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
             DoubleBuffered = true;
+            Text = "Test game build";
         }
 
         public PlatformerForm()
         {
             InitializeComponent();
-            var levels = LoadLevels();
-
-            var button = new Button
-            {
-                Location = new Point(0, 0),
-                Size = new Size(ClientSize.Width, 30),
-                Text = "This is test button"
-            };
-
-            //Controls.Add(button);
-            button.Click += Button_Click;
 
             timer = new Timer { Interval = 50 };
             timer.Tick += Timer_Tick;
@@ -43,59 +34,94 @@ namespace Platformer
             Invalidate();
         }
 
-        private void Button_Click(object sender, EventArgs e)
-        {
-            ((Button)sender).Text = "Why did you just click on this test button";
-            ((Button)sender).Font = new Font(FontFamily.GenericMonospace, 16);
-        }
-
         private static IEnumerable<Map> LoadLevels()
         {
+            yield return Map.FromLines(Game.MapWithoutWalls);
             yield return Map.FromLines(Game.TestMap);
+            yield return Map.FromLines(Game.TestMap2);
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Game.CurrentMap = Map.FromLines(Game.TestMap);
+
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
             var graphics = e.Graphics;
-            var tileSize = 30;
+            var map = game.CurrentMap;
+            var player = game.Player;
+            var tileSize = ClientSize.Width / map.Level.GetLength(0);
             for (var y = 0; y < map.Level.GetLength(1); y++)
                 for (var x = 0; x < map.Level.GetLength(0); x++)
-                    if (map.IsSolid(x, y))
-                        graphics.FillRectangle(Brushes.DarkGray, x * tileSize, y * tileSize, tileSize, tileSize);
-                    else
-                        graphics.FillRectangle(Brushes.CornflowerBlue, x * tileSize, y * tileSize, tileSize, tileSize);
-            graphics.FillRectangle(Brushes.DarkSeaGreen, map.Player.PosX * tileSize, map.Player.PosY * tileSize, tileSize, tileSize);
+                    switch (map.Level[x, y])
+                    {
+                        case TileType.Wall:
+                            graphics.FillRectangle(Brushes.DarkGray, x * tileSize, y * tileSize, tileSize, tileSize);
+                            break;
+                        case TileType.Ground:
+                            graphics.FillRectangle(Brushes.CornflowerBlue, x * tileSize, y * tileSize, tileSize, tileSize);
+                            break;
+                    }
+            graphics.FillRectangle(Brushes.DarkSeaGreen, player.PosX * tileSize,
+                player.PosY * tileSize, tileSize, tileSize);
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            var speed = 6;
+            var speed = 6f;
+            var player = game.Player;
             base.OnKeyDown(e);
             switch (e.KeyCode)
             {
                 case Keys.Right:
-                    map.Player.MoveHorizontally(speed);
+                    player.VelocityX = speed;
                     break;
                 case Keys.Left:
-                    map.Player.MoveHorizontally(-speed);
+                    player.VelocityX = -speed;
                     break;
                 case Keys.Up:
-                    map.Player.MoveVertically(-speed);
+                    player.VelocityY = -speed;
                     break;
                 case Keys.Down:
-                    map.Player.MoveVertically(speed);
+                    player.VelocityY = speed;
                     break;
-                case Keys.Enter:
-                    Game.CurrentMap = Map.FromLines(Game.TestMap2);
-                    map = Map.FromLines(Game.TestMap2);
+                case Keys.D1:
+                    game.ChangeMap(levels[0]);
+                    break;
+                case Keys.D2:
+                    game.ChangeMap(levels[1]);
+                    break;
+                case Keys.D3:
+                    game.ChangeMap(levels[2]);
                     break;
             }
+
+            player.MakeMove(player.VelocityX, player.VelocityY);
+        }
+
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            var player = game.Player;
+            base.OnKeyUp(e);
+            switch (e.KeyCode)
+            {
+                case Keys.Right:
+                    player.VelocityX = 0;
+                    break;
+                case Keys.Left:
+                    player.VelocityX = 0;
+                    break;
+                case Keys.Up:
+                    player.VelocityY = 0;
+                    break;
+                case Keys.Down:
+                    player.VelocityY = 0;
+                    break;
+            }
+
+            //player.MakeMove(player.VelocityX, player.VelocityY);
         }
     }
 }

@@ -3,11 +3,19 @@
     public class Game
     {
         public GameStage GameStage { get; set; }
-        public static Map CurrentMap;
+        public Map CurrentMap { get; set; }
+        public Player Player { get; private set; }
 
         public Game(Map currentMap)
         {
             CurrentMap = currentMap;
+            Player = new Player(currentMap);
+        }
+
+        public void ChangeMap(Map map)
+        {
+            CurrentMap = map;
+            Player = new Player(map);
         }
 
         public static string[] TestMap =
@@ -31,6 +39,18 @@
             "#...###.#.#######.#",
             "#...##.........##.#",
             "#.......######....#",
+            "###################",
+        };
+
+        public static string[] MapWithoutWalls =
+        {
+            "###################",
+            "#P................#",
+            "#.................#",
+            "#.................#",
+            "#.................#",
+            "#.................#",
+            "#.................#",
             "###################",
         };
     }

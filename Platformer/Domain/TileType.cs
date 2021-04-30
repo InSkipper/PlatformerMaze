@@ -3,6 +3,7 @@
     public enum TileType
     {
         Ground,
-        Wall
+        Wall,
+        Error
     }
 }

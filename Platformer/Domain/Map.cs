@@ -7,7 +7,6 @@ namespace Platformer.Domain
     {
         public readonly TileType[,] Level;
         public readonly Point InitialPosition;
-        public readonly Player Player;
         private readonly bool[,] isSolid;
 
         public Map(TileType[,] level, bool[,] isSolid, Point initialPosition)
@@ -15,7 +14,6 @@ namespace Platformer.Domain
             Level = level;
             this.isSolid = isSolid;
             InitialPosition = initialPosition;
-            Player = new Player(initialPosition.X, initialPosition.Y);
         }
 
         public static Map FromText(string text)
