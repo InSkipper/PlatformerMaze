@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -12,6 +13,8 @@ namespace Platformer
         private readonly Game game = new Game(LoadLevels().First());
         private readonly Timer timer;
         private readonly Map[] levels = LoadLevels().ToArray();
+        private float deltaTime = 0.05f;
+        private Stopwatch stopwatch;
 
         protected override void OnLoad(EventArgs e)
         {
@@ -32,6 +35,9 @@ namespace Platformer
         private void Timer_Tick(object sender, EventArgs e)
         {
             Invalidate();
+            //deltaTime = Math.Max(timer.Interval / 1000f, (float)stopwatch.Elapsed.TotalSeconds);
+            Text = "Delta time= " + deltaTime;
+            game.Player.MakeMove(game.Player.VelocityX, game.Player.VelocityY);
         }
 
         private static IEnumerable<Map> LoadLevels()
@@ -48,6 +54,7 @@ namespace Platformer
 
         protected override void OnPaint(PaintEventArgs e)
         {
+            stopwatch = Stopwatch.StartNew();
             base.OnPaint(e);
             var graphics = e.Graphics;
             var map = game.CurrentMap;
@@ -58,14 +65,17 @@ namespace Platformer
                     switch (map.Level[x, y])
                     {
                         case TileType.Wall:
-                            graphics.FillRectangle(Brushes.DarkGray, x * tileSize, y * tileSize, tileSize, tileSize);
+                            //graphics.FillRectangle(Brushes.DarkGray, x * tileSize, y * tileSize, tileSize, tileSize);
+                            graphics.DrawImage(new Bitmap(@"C:\Users\User\Desktop\Walls.png"), new Rectangle(x * tileSize, y * tileSize, tileSize, tileSize));
                             break;
                         case TileType.Ground:
-                            graphics.FillRectangle(Brushes.CornflowerBlue, x * tileSize, y * tileSize, tileSize, tileSize);
+                            //graphics.FillRectangle(Brushes.CornflowerBlue, x * tileSize, y * tileSize, tileSize, tileSize);
+                            graphics.DrawImage(new Bitmap(@"C:\Users\User\Desktop\Grass.png"), new Rectangle(x * tileSize, y * tileSize, tileSize, tileSize));
                             break;
                     }
             graphics.FillRectangle(Brushes.DarkSeaGreen, player.PosX * tileSize,
                 player.PosY * tileSize, tileSize, tileSize);
+            stopwatch.Stop();
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -76,16 +86,16 @@ namespace Platformer
             switch (e.KeyCode)
             {
                 case Keys.Right:
-                    player.VelocityX = speed;
+                    player.VelocityX = speed * deltaTime;
                     break;
                 case Keys.Left:
-                    player.VelocityX = -speed;
+                    player.VelocityX = -speed * deltaTime;
                     break;
                 case Keys.Up:
-                    player.VelocityY = -speed;
+                    player.VelocityY = -speed * deltaTime;
                     break;
                 case Keys.Down:
-                    player.VelocityY = speed;
+                    player.VelocityY = speed * deltaTime;
                     break;
                 case Keys.D1:
                     game.ChangeMap(levels[0]);
@@ -97,8 +107,6 @@ namespace Platformer
                     game.ChangeMap(levels[2]);
                     break;
             }
-
-            player.MakeMove(player.VelocityX, player.VelocityY);
         }
 
         protected override void OnKeyUp(KeyEventArgs e)
@@ -120,8 +128,6 @@ namespace Platformer
                     player.VelocityY = 0;
                     break;
             }
-
-            //player.MakeMove(player.VelocityX, player.VelocityY);
         }
     }
 }

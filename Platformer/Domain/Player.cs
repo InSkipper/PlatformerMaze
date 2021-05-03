@@ -9,7 +9,7 @@ namespace Platformer.Domain
         public float PosY;
         public float VelocityX = 0;
         public float VelocityY = 0;
-        private float deltaTime = 1 / 60f;
+        //private float deltaTime = 0.05f;
         public Map Map { get; set; }
 
         public Player(Map map)
@@ -21,8 +21,8 @@ namespace Platformer.Domain
 
         public void MakeMove(float velocityX, float velocityY)
         {
-            var newPosX = PosX + velocityX * deltaTime;
-            var newPosY = PosY + velocityY * deltaTime;
+            var newPosX = PosX + velocityX;
+            var newPosY = PosY + velocityY;
 
             if (velocityX <= 0)
             {
