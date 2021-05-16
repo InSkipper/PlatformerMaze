@@ -4,6 +4,7 @@
     {
         Ground,
         Wall,
+        Spike,
         Error
     }
 }

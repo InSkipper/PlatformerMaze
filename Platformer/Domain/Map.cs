@@ -1,20 +1,37 @@
 ﻿using System;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace Platformer.Domain
 {
     public class Map
     {
-        public readonly TileType[,] Level;
+        public static int TileSize = 60;
         public readonly Point InitialPosition;
+        private readonly TileType[,] level;
         private readonly bool[,] isSolid;
 
         public Map(TileType[,] level, bool[,] isSolid, Point initialPosition)
         {
-            Level = level;
+            this.level = level;
             this.isSolid = isSolid;
             InitialPosition = initialPosition;
         }
+
+        public TileType this[float x, float y]
+        {
+            get
+            {
+                if (InBounds(x, y))
+                    return level[(int)x, (int)y];
+                return TileType.Wall;
+            }
+        }
+
+        public int VisibleTilesX => 600 / TileSize;
+        public int VisibleTilesY => 400 / TileSize;
+        public int Width => level.GetLength(0);
+        public int Height => level.GetLength(1);
 
         public static Map FromText(string text)
         {
@@ -39,6 +56,9 @@ namespace Platformer.Domain
                         case 'P':
                             initialPosition = new Point(x, y);
                             break;
+                        case 'A':
+                            level[x, y] = TileType.Spike;
+                            break;
                         default:
                             level[x, y] = TileType.Ground;
                             break;
@@ -49,7 +69,7 @@ namespace Platformer.Domain
 
         public bool InBounds(float x, float y)
         {
-            return x >= 0 && x < Level.GetLength(0) && y >= 0 && y < Level.GetLength(1);
+            return x >= 0 && x < level.GetLength(0) && y >= 0 && y < level.GetLength(1);
         }
 
         public bool IsSolid(float x, float y)

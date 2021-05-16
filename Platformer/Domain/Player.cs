@@ -1,16 +1,13 @@
-﻿using System;
-using System.Drawing;
-
-namespace Platformer.Domain
+﻿namespace Platformer.Domain
 {
-    public class Player
+    public class Player : ICreature
     {
         public float PosX;
         public float PosY;
         public float VelocityX = 0;
         public float VelocityY = 0;
-        //private float deltaTime = 0.05f;
         public Map Map { get; set; }
+        public bool IsDead;
 
         public Player(Map map)
         {
@@ -54,6 +51,24 @@ namespace Platformer.Domain
 
             PosX = newPosX;
             PosY = newPosY;
+
+            //Если карта не закрыта, то выходит за пределы массива
+            //if (Map.Level[(int)newPosX, (int)newPosY] == TileType.Spike
+            //|| Map.Level[(int)newPosX + 1, (int)newPosY] == TileType.Spike
+            //|| Map.Level[(int)newPosX, (int)newPosY + 1] == TileType.Spike
+            //|| Map.Level[(int)newPosX + 1, (int)newPosY + 1] == TileType.Spike)
+            //    IsDead = true;
+
+        }
+
+        public void MakeMove()
+        {
+            MakeMove(VelocityX, VelocityY);
+        }
+
+        public void MakeMove(float deltaTime)
+        {
+            MakeMove(VelocityX * deltaTime, VelocityY * deltaTime);
         }
     }
 }

@@ -51,6 +51,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\Assets.cs" />
+    <Compile Include="Domain\Camera.cs" />
+    <Compile Include="Domain\Dynamic.cs" />
+    <Compile Include="Domain\ICreature.cs" />
     <Compile Include="Domain\Player.cs" />
     <Compile Include="Domain\Direction.cs" />
     <Compile Include="Domain\Game.cs" />
