@@ -28,8 +28,6 @@ namespace Platformer.Domain
             }
         }
 
-        public int VisibleTilesX => 600 / TileSize;
-        public int VisibleTilesY => 400 / TileSize;
         public int Width => level.GetLength(0);
         public int Height => level.GetLength(1);
 

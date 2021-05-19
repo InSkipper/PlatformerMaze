@@ -1,27 +1,32 @@
-﻿namespace Platformer.Domain
+﻿using System.Windows.Forms;
+
+namespace Platformer.Domain
 {
     public class Camera
     {
         public float PositionX => Player.PosX;
         public float PositionY => Player.PosY;
+        private int width, height;
         public Map Map;
         public Player Player;
 
-        public Camera(Map map, Player player)
+        public Camera(Map map, Player player, int width, int height)
         {
             Map = map;
             Player = player;
+            this.width = width;
+            this.height = height;
         }
 
         public float OffsetX
         {
             get
             {
-                var offset = PositionX - Map.VisibleTilesX / 2f;
+                var offset = PositionX - VisibleTilesX / 2f;
                 if (offset < 0)
                     return 0;
-                if (offset > Map.Width - Map.VisibleTilesX)
-                    return Map.Width - Map.VisibleTilesX;
+                if (offset > Map.Width - VisibleTilesX)
+                    return Map.Width - VisibleTilesX;
                 return offset;
             }
         }
@@ -31,12 +36,31 @@
         {
             get
             {
-                var offset = PositionY - Map.VisibleTilesY / 2f;
+                var offset = PositionY - VisibleTilesY / 2f;
                 if (offset < 0)
                     return 0;
-                if (offset > Map.Height - Map.VisibleTilesY)
-                    return Map.Height - Map.VisibleTilesY;
+                if (offset > Map.Height - VisibleTilesY)
+                    return Map.Height - VisibleTilesY;
                 return offset;
+            }
+        }
+        public int VisibleTilesX
+        {
+            get
+            {
+                if (Form.ActiveForm != null)
+                    return width/ Map.TileSize + 1;
+                return 0;
+            }
+        }
+
+        public int VisibleTilesY
+        {
+            get
+            {
+                if (Form.ActiveForm != null)
+                    return height / Map.TileSize + 1;
+                return 0;
             }
         }
 

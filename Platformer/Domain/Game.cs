@@ -11,14 +11,14 @@
         {
             CurrentMap = currentMap;
             Player = new Player(currentMap);
-            Camera = new Camera(currentMap, Player);
+            Camera = new Camera(currentMap, Player, 600 ,400);
         }
 
         public void ChangeMap(Map map)
         {
             CurrentMap = map;
             Player = new Player(map);
-            Camera = new Camera(map, Player);
+            Camera = new Camera(map, Player, 600, 400);
         }
 
         public static string[] TestMap =
