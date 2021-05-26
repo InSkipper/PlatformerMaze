@@ -42,7 +42,6 @@ namespace Platformer
             yield return Map.FromLines(Game.TestMap);
             yield return Map.FromLines(Game.TestMap2);
             yield return Map.FromLines(Game.LargeMap);
-
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -59,8 +58,8 @@ namespace Platformer
             var player = game.Player;
             var tileSize = Map.TileSize;
 
-            for (var y = -1; y <=game.Camera.VisibleTilesY; y++)
-                for (var x = -1; x <= game.Camera.VisibleTilesX; x++)
+            for (var y = -1; y <= game.Camera.VisibleTilesY; y++)
+                for (var x = -1; x <= game.Camera.VisibleTilesX + 1; x++)
                     switch (map[x + game.Camera.OffsetX, y + game.Camera.OffsetY])
                     {
                         case TileType.Wall:
@@ -76,16 +75,19 @@ namespace Platformer
                             break;
 
                     }
-            //if (player.IsDead)
-            //    graphics.FillRectangle(Brushes.Red, (player.PosX) * tileSize,
-            //        player.PosY * tileSize, tileSize, tileSize);
-            //else
-            graphics.FillRectangle(Brushes.DarkSeaGreen,
+            graphics.DrawImage(Assets["creature"], new RectangleF(
                 (player.PosX - game.Camera.OffsetX) * tileSize,
                 (player.PosY - game.Camera.OffsetY) * tileSize,
-                tileSize,
-                tileSize);
-            //Text = game.Camera.OffsetX + " " + game.Camera.OffsetY;
+                tileSize + 1,
+                tileSize + 1));
+            foreach (var enemy in map.Enemies)
+            {
+                graphics.DrawImage(Assets["creature"], new RectangleF(
+                    (enemy.PosX - game.Camera.OffsetX) * tileSize,
+                    (enemy.PosY - game.Camera.OffsetY) * tileSize,
+                    tileSize + 1,
+                    tileSize + 1));
+            }
         }
 
         private void DrawTile(Bitmap bitmap, Graphics graphics, int x, int y)
@@ -93,8 +95,8 @@ namespace Platformer
             graphics.DrawImage(bitmap, new RectangleF(
                 x * Map.TileSize - game.Camera.TileOffsetX,
                 y * Map.TileSize - game.Camera.TileOffsetY,
-                Map.TileSize,
-                Map.TileSize));
+                Map.TileSize + 1,
+                Map.TileSize + 1));
         }
 
         private void DrawTile(Brush brush, Graphics graphics, int x, int y)
@@ -111,7 +113,25 @@ namespace Platformer
             var now = DateTime.Now;
             var deltaTime = (float)(now - lastUpdate).TotalMilliseconds / 1000f;
             if (lastUpdate != DateTime.MinValue)
+            {
                 game.Player.MakeMove(deltaTime);
+                foreach (var enemy in game.CurrentMap.Enemies)
+                {
+                    if (Math.Abs(game.Player.PosX - enemy.PosX) > 1e-2)
+                        enemy.VelocityX = (game.Player.PosX - enemy.PosX) /
+                                          (float)Math.Sqrt((game.Player.PosX - enemy.PosX) *
+                                                            (game.Player.PosX - enemy.PosX)) *
+                                          deltaTime;
+                    else enemy.VelocityX = 0;
+                    if (Math.Abs(game.Player.PosY - enemy.PosY) > 1e-2)
+                        enemy.VelocityY = (game.Player.PosY - enemy.PosY) /
+                                          (float)Math.Sqrt((game.Player.PosY - enemy.PosY) *
+                                                            (game.Player.PosY - enemy.PosY)) *
+                                          deltaTime;
+                    else enemy.VelocityY = 0;
+                    enemy.MakeMove();
+                }
+            }
             lastUpdate = now;
             Text = "Delta time= " + deltaTime;
         }
@@ -136,16 +156,10 @@ namespace Platformer
                     player.VelocityY = speed;
                     break;
                 case Keys.D1:
-                    game.ChangeMap(levels[e.KeyValue - 49]);
-                    break;
                 case Keys.D2:
-                    game.ChangeMap(levels[1]);
-                    break;
                 case Keys.D3:
-                    game.ChangeMap(levels[2]);
-                    break;
                 case Keys.D4:
-                    game.ChangeMap(levels[3]);
+                    game.ChangeMap(levels[e.KeyValue - 49]);
                     break;
             }
         }
@@ -169,12 +183,6 @@ namespace Platformer
                     player.VelocityY = 0;
                     break;
             }
-        }
-
-        protected override void OnResize(EventArgs e)
-        {
-            base.OnResize(e);
-            game.Camera = new Camera(game.CurrentMap, game.Player, ClientSize.Width, ClientSize.Height);
         }
     }
 }

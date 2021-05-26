@@ -4,18 +4,15 @@ namespace Platformer.Domain
 {
     public class Camera
     {
-        public float PositionX => Player.PosX;
-        public float PositionY => Player.PosY;
-        private int width, height;
+        public float PositionX => Creature.PosX;
+        public float PositionY => Creature.PosY;
         public Map Map;
-        public Player Player;
+        public Creature Creature;
 
-        public Camera(Map map, Player player, int width, int height)
+        public Camera(Map map, Creature creature)
         {
             Map = map;
-            Player = player;
-            this.width = width;
-            this.height = height;
+            Creature = creature;
         }
 
         public float OffsetX
@@ -44,25 +41,8 @@ namespace Platformer.Domain
                 return offset;
             }
         }
-        public int VisibleTilesX
-        {
-            get
-            {
-                if (Form.ActiveForm != null)
-                    return width/ Map.TileSize + 1;
-                return 0;
-            }
-        }
-
-        public int VisibleTilesY
-        {
-            get
-            {
-                if (Form.ActiveForm != null)
-                    return height / Map.TileSize + 1;
-                return 0;
-            }
-        }
+        public int VisibleTilesX => 600 / Map.TileSize;
+        public int VisibleTilesY => 400 / Map.TileSize;
 
         public float TileOffsetX => (OffsetX - (int)OffsetX) * Map.TileSize;
         public float TileOffsetY => (OffsetY - (int)OffsetY) * Map.TileSize;

@@ -1,21 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
-using System.Windows.Forms;
 
 namespace Platformer.Domain
 {
     public class Map
     {
-        public static int TileSize = 60;
+        public static int TileSize = 16 * 4;
         public readonly Point InitialPosition;
         private readonly TileType[,] level;
         private readonly bool[,] isSolid;
+        public List<Creature> Enemies;
 
-        public Map(TileType[,] level, bool[,] isSolid, Point initialPosition)
+
+        public Map(TileType[,] level, bool[,] isSolid, Point initialPosition, List<Creature> enemies)
         {
             this.level = level;
             this.isSolid = isSolid;
             InitialPosition = initialPosition;
+            Enemies = enemies;
         }
 
         public TileType this[float x, float y]
@@ -39,6 +42,7 @@ namespace Platformer.Domain
 
         public static Map FromLines(string[] lines)
         {
+            var enemies = new List<Creature>();
             var level = new TileType[lines[0].Length, lines.Length];
             var isSolid = new bool[lines[0].Length, lines.Length];
             var initialPosition = Point.Empty;
@@ -57,12 +61,15 @@ namespace Platformer.Domain
                         case 'A':
                             level[x, y] = TileType.Spike;
                             break;
+                        case 'E':
+                            enemies.Add(new Enemy(x, y));
+                            break;
                         default:
                             level[x, y] = TileType.Ground;
                             break;
                     }
                 }
-            return new Map(level, isSolid, initialPosition);
+            return new Map(level, isSolid, initialPosition, enemies);
         }
 
         public bool InBounds(float x, float y)
