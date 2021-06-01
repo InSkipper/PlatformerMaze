@@ -10,7 +10,7 @@ namespace Platformer
 {
     public partial class PlatformerForm : Form
     {
-        private readonly Game game = new Game(LoadLevels().First());
+        private readonly Game game = new Game(LoadLevels().Skip(1).First());
         private readonly Timer timer;
         private readonly Map[] levels = LoadLevels().ToArray();
         private DateTime lastUpdate = DateTime.MinValue;
@@ -73,12 +73,14 @@ namespace Platformer
                             break;
                     }
 
-            if (player.IsDead)
-                Text = "Dead";
-            else Text = "Alive";
+            graphics.DrawLine(new Pen(Color.Black, 10), 1, 1, 50, 50f);
+            //if (player.IsDead)
+            //    Text = "Dead";
+            //else Text = "Alive";
             DrawCreature(Assets["creature"], graphics, player.PosX, player.PosY);
             foreach (var enemy in map.Enemies)
                 DrawCreature(Assets["creature"], graphics, enemy.PosX, enemy.PosY);
+            Text = "EnemyX: " + map.Enemies.First().VelocityX + " EnemyY: " + map.Enemies.First().VelocityY;
         }
 
         private void DrawCreature(Bitmap bitmap, Graphics graphics, float x, float y)

@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 
 namespace Platformer.Domain
 {
@@ -87,54 +89,87 @@ namespace Platformer.Domain
 
         public void MoveToTarget(float deltaTime)
         {
-            //if (Math.Abs(TargetX - PosX) > 1e-2)
-            //    VelocityX = (TargetX - PosX) /
-            //                (float)Math.Sqrt((TargetX - PosX) *
-            //                                 (TargetX - PosX));
-            //else VelocityX = 0;
-            //if (Math.Abs(TargetY - PosY) > 1e-2)
-            //    VelocityY = (TargetY - PosY) /
-            //                (float)Math.Sqrt((TargetY - PosY) *
-            //                                 (TargetY - PosY));
-            //else VelocityY = 0;
             var shortestPath = FindShortestPath(Map, new PointF(PosX, PosY),
-                new[] { new Point((int)TargetX, (int)TargetY) }).FirstOrDefault();
+                    new PointF(TargetX, TargetY), deltaTime).FirstOrDefault();
             if (shortestPath != null)
             {
-                VelocityX = shortestPath.Reverse().Skip(1).FirstOrDefault().X - PosX;
-                VelocityY = shortestPath.Reverse().Skip(1).FirstOrDefault().Y - PosY;
+                var point = shortestPath.Reverse().Skip(1).FirstOrDefault();
+                if (point.X == 0 && point.Y == 0)
+                {
+                    VelocityX = 0;
+                    VelocityY = 0;
+                }
+                else
+                {
+                    VelocityX = point.X - PosX;
+                    VelocityY = point.Y - PosY;
+                }
             }
 
-            else
-            {
-                VelocityX = 0;
-                VelocityY = 0;
-            }
-            MakeMove(VelocityX * deltaTime * 2, VelocityY * deltaTime * 2);
+            MakeMove(VelocityX * deltaTime * 3, VelocityY * deltaTime * 3);
         }
 
-        public IEnumerable<SinglyLinkedList<PointF>> FindShortestPath(Map map, PointF start, Point[] checkPoints)
+        public IEnumerable<SinglyLinkedList<PointF>> FindShortestPath(Map map, PointF start, PointF end, float deltaTime)
         {
             var queue = new Queue<SinglyLinkedList<PointF>>();
             queue.Enqueue(new SinglyLinkedList<PointF>(start));
-            var checkPointsSet = checkPoints.ToHashSet();
-            var visited = new HashSet<Point>();
+            var visited = new HashSet<PointF>();
 
             while (queue.Count != 0)
             {
                 var list = queue.Dequeue();
                 var point = list.Value;
-                if (!map.InBounds((int)point.X, (int)point.Y)
-                || visited.Contains(new Point((int)point.X, (int)point.Y))
-                || map[(int)point.X, (int)point.Y] == TileType.Wall)
+                if (!map.InBounds(point.X, point.Y)
+                || visited.Contains(new PointF(point.X, point.Y))
+                ||
+                /*map[point.X, point.Y] == TileType.Wall*/
+                list.Previous != null &&
+                    IsSolid((point.X - list.Previous.Value.X) * deltaTime, (point.Y - list.Previous.Value.Y) * deltaTime, list.Previous.Value)
+                )
                     continue;
 
-                if (checkPointsSet.Contains(new Point((int)point.X, (int)point.Y)))
+                if (Math.Abs(end.X - point.X) <= 0.5 && Math.Abs(end.Y - point.Y) <= 0.5)
                     yield return list;
-                visited.Add(new Point((int)point.X, (int)point.Y));
+                visited.Add(new PointF(point.X, point.Y));
                 foreach (var nextPoint in point.Neighbors())
                     queue.Enqueue(new SinglyLinkedList<PointF>(nextPoint, list));
             }
+        }
+
+        private bool IsSolid(float velocityX, float velocityY, PointF pos)
+        {
+            var newPosX = pos.X + velocityX;
+            var newPosY = pos.Y + velocityY;
+
+            if (velocityX <= 0)
+            {
+                if (Map.IsSolid(newPosX, pos.Y)
+                    || Map.IsSolid(newPosX, pos.Y + 0.9f))
+                {
+                    return true;
+                }
+            }
+            else if (Map.IsSolid(newPosX + 1, pos.Y)
+                     || Map.IsSolid(newPosX + 1, pos.Y + 0.9f))
+            {
+                return true;
+            }
+
+            if (velocityY <= 0)
+            {
+                if (Map.IsSolid(newPosX, newPosY)
+                    || Map.IsSolid(newPosX + 0.9f, newPosY))
+                {
+                    return true;
+                }
+            }
+            else if (Map.IsSolid(newPosX, newPosY + 1)
+                     || Map.IsSolid(newPosX + 0.9f, newPosY + 1))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 
@@ -142,23 +177,21 @@ namespace Platformer.Domain
 
     public static class PointExtensions
     {
+        private static int speed = 1;
+
+        private static readonly HashSet<SizeF> offsets = new HashSet<SizeF>
+        {
+            new SizeF(0, -speed),
+            new SizeF(0, speed),
+            new SizeF(speed, 0),
+            new SizeF(-speed, 0),
+        };
+
         public static IEnumerable<PointF> Neighbors(this PointF point)
         {
             return offsets
                 .Select(offset => point + offset);
         }
-
-        private static readonly HashSet<SizeF> offsets = new HashSet<SizeF>
-        {
-            new SizeF(0, -1),
-            new SizeF(1, 0),
-            new SizeF(-1, 0),
-            new SizeF(1, 1),
-            new SizeF(1, -1),
-            new SizeF(-1, 1),
-            new SizeF(-1, -1),
-            new SizeF(0, 1),
-        };
     }
 
     public class SinglyLinkedList<T> : IEnumerable<T>
