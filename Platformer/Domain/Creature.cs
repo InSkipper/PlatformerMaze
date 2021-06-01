@@ -1,13 +1,14 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Windows.Forms;
 
 namespace Platformer.Domain
 {
     public class Creature
     {
-        public float PosX;
-        public float PosY;
-        public float VelocityX = 0;
-        public float VelocityY = 0;
+        public float PosX { get; set; }
+        public float PosY { get; set; }
+        public float VelocityX { get; set; }
+        public float VelocityY { get; set; }
         public Map Map { get; set; }
         public bool IsDead;
 
@@ -67,17 +68,32 @@ namespace Platformer.Domain
             PosY = map.InitialPosition.Y;
             Map = map;
         }
-
-        
     }
 
     public class Enemy : Creature
     {
+        public float TargetX { get; set; }
+        public float TargetY { get; set; }
+
         public Enemy(float posX, float posY)
         {
             PosX = posX;
             PosY = posY;
-            Map = Map.FromLines(Game.LargeMap);
+        }
+
+        public void MoveToTarget(float deltaTime)
+        {
+            if (Math.Abs(TargetX - PosX) > 1e-2)
+                VelocityX = (TargetX - PosX) /
+                            (float)Math.Sqrt((TargetX - PosX) *
+                                             (TargetX - PosX));
+            else VelocityX = 0;
+            if (Math.Abs(TargetY - PosY) > 1e-2)
+                VelocityY = (TargetY - PosY) /
+                            (float)Math.Sqrt((TargetY - PosY) *
+                                             (TargetY - PosY));
+            else VelocityY = 0;
+            MakeMove(VelocityX * deltaTime * 2, VelocityY * deltaTime * 2);
         }
     }
 }

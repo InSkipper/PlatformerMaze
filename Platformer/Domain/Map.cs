@@ -10,10 +10,10 @@ namespace Platformer.Domain
         public readonly Point InitialPosition;
         private readonly TileType[,] level;
         private readonly bool[,] isSolid;
-        public List<Creature> Enemies;
+        public List<Enemy> Enemies;
 
 
-        public Map(TileType[,] level, bool[,] isSolid, Point initialPosition, List<Creature> enemies)
+        public Map(TileType[,] level, bool[,] isSolid, Point initialPosition, List<Enemy> enemies)
         {
             this.level = level;
             this.isSolid = isSolid;
@@ -42,7 +42,7 @@ namespace Platformer.Domain
 
         public static Map FromLines(string[] lines)
         {
-            var enemies = new List<Creature>();
+            var enemies = new List<Enemy>();
             var level = new TileType[lines[0].Length, lines.Length];
             var isSolid = new bool[lines[0].Length, lines.Length];
             var initialPosition = Point.Empty;

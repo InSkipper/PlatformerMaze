@@ -46,17 +46,15 @@ namespace Platformer
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            Update();
+            game.Update();
             base.OnPaint(e);
             var graphics = e.Graphics;
             var map = game.CurrentMap;
             var player = game.Player;
-            var tileSize = Map.TileSize;
 
             for (var y = -1; y <= game.Camera.VisibleTilesY; y++)
                 for (var x = -1; x <= game.Camera.VisibleTilesX + 1; x++)
@@ -73,21 +71,19 @@ namespace Platformer
                         case TileType.Spike:
                             DrawTile(Brushes.Pink, graphics, x, y);
                             break;
-
                     }
-            graphics.DrawImage(Assets["creature"], new RectangleF(
-                (player.PosX - game.Camera.OffsetX) * tileSize,
-                (player.PosY - game.Camera.OffsetY) * tileSize,
-                tileSize + 1,
-                tileSize + 1));
+            DrawCreature(Assets["creature"], graphics, player.PosX, player.PosY);
             foreach (var enemy in map.Enemies)
-            {
-                graphics.DrawImage(Assets["creature"], new RectangleF(
-                    (enemy.PosX - game.Camera.OffsetX) * tileSize,
-                    (enemy.PosY - game.Camera.OffsetY) * tileSize,
-                    tileSize + 1,
-                    tileSize + 1));
-            }
+                DrawCreature(Assets["creature"], graphics, enemy.PosX, enemy.PosY);
+        }
+
+        private void DrawCreature(Bitmap bitmap, Graphics graphics, float x, float y)
+        {
+            graphics.DrawImage(bitmap, new RectangleF(
+                (x - game.Camera.OffsetX) * Map.TileSize,
+                (y - game.Camera.OffsetY) * Map.TileSize,
+                Map.TileSize + 1,
+                Map.TileSize + 1));
         }
 
         private void DrawTile(Bitmap bitmap, Graphics graphics, int x, int y)
@@ -106,34 +102,6 @@ namespace Platformer
                 y * Map.TileSize - game.Camera.TileOffsetY,
                 Map.TileSize,
                 Map.TileSize));
-        }
-
-        private new void Update()
-        {
-            var now = DateTime.Now;
-            var deltaTime = (float)(now - lastUpdate).TotalMilliseconds / 1000f;
-            if (lastUpdate != DateTime.MinValue)
-            {
-                game.Player.MakeMove(deltaTime);
-                foreach (var enemy in game.CurrentMap.Enemies)
-                {
-                    if (Math.Abs(game.Player.PosX - enemy.PosX) > 1e-2)
-                        enemy.VelocityX = (game.Player.PosX - enemy.PosX) /
-                                          (float)Math.Sqrt((game.Player.PosX - enemy.PosX) *
-                                                            (game.Player.PosX - enemy.PosX)) *
-                                          deltaTime;
-                    else enemy.VelocityX = 0;
-                    if (Math.Abs(game.Player.PosY - enemy.PosY) > 1e-2)
-                        enemy.VelocityY = (game.Player.PosY - enemy.PosY) /
-                                          (float)Math.Sqrt((game.Player.PosY - enemy.PosY) *
-                                                            (game.Player.PosY - enemy.PosY)) *
-                                          deltaTime;
-                    else enemy.VelocityY = 0;
-                    enemy.MakeMove();
-                }
-            }
-            lastUpdate = now;
-            Text = "Delta time= " + deltaTime;
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
