@@ -59,8 +59,13 @@
     <Compile Include="Domain\Game.cs" />
     <Compile Include="Domain\GameStage.cs" />
     <Compile Include="Domain\Map.cs" />
+    <Compile Include="Domain\PointExtensions.cs" />
+    <Compile Include="Domain\SinglyLinkedList.cs" />
     <Compile Include="Domain\Tile.cs" />
     <Compile Include="Domain\TileType.cs" />
+    <Compile Include="Button.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="PlatformerForm.cs">
       <SubType>Form</SubType>
     </Compile>

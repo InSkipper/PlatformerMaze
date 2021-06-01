@@ -5,6 +5,7 @@
         Ground,
         Wall,
         Spike,
+        Exit,
         Error
     }
 }

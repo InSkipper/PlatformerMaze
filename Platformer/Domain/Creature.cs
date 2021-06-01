@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 
 namespace Platformer.Domain
 {
@@ -70,8 +66,8 @@ namespace Platformer.Domain
     {
         public Player(Map map)
         {
-            PosX = map.InitialPosition.X;
-            PosY = map.InitialPosition.Y;
+            PosX = map.Start.X;
+            PosY = map.Start.Y;
             Map = map;
         }
     }
@@ -145,80 +141,23 @@ namespace Platformer.Domain
             {
                 if (Map.IsSolid(newPosX, pos.Y)
                     || Map.IsSolid(newPosX, pos.Y + 0.9f))
-                {
                     return true;
-                }
             }
             else if (Map.IsSolid(newPosX + 1, pos.Y)
                      || Map.IsSolid(newPosX + 1, pos.Y + 0.9f))
-            {
                 return true;
-            }
 
             if (velocityY <= 0)
             {
                 if (Map.IsSolid(newPosX, newPosY)
                     || Map.IsSolid(newPosX + 0.9f, newPosY))
-                {
                     return true;
-                }
             }
             else if (Map.IsSolid(newPosX, newPosY + 1)
                      || Map.IsSolid(newPosX + 0.9f, newPosY + 1))
-            {
                 return true;
-            }
 
             return false;
-        }
-    }
-
-
-
-    public static class PointExtensions
-    {
-        private static int speed = 1;
-
-        private static readonly HashSet<SizeF> offsets = new HashSet<SizeF>
-        {
-            new SizeF(0, -speed),
-            new SizeF(0, speed),
-            new SizeF(speed, 0),
-            new SizeF(-speed, 0),
-        };
-
-        public static IEnumerable<PointF> Neighbors(this PointF point)
-        {
-            return offsets
-                .Select(offset => point + offset);
-        }
-    }
-
-    public class SinglyLinkedList<T> : IEnumerable<T>
-    {
-        public readonly T Value;
-        public readonly SinglyLinkedList<T> Previous;
-
-        public SinglyLinkedList(T value, SinglyLinkedList<T> previous = null)
-        {
-            Value = value;
-            Previous = previous;
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            yield return Value;
-            var current = Previous;
-            while (current != null)
-            {
-                yield return current.Value;
-                current = current.Previous;
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
     }
 }

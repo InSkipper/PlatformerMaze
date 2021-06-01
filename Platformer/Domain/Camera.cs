@@ -41,8 +41,8 @@ namespace Platformer.Domain
                 return offset;
             }
         }
-        public int VisibleTilesX => 600 / Map.TileSize;
-        public int VisibleTilesY => 400 / Map.TileSize;
+        public int VisibleTilesX => 1920 / 2 / Map.TileSize;
+        public int VisibleTilesY => 1080 / 2 / Map.TileSize;
 
         public float TileOffsetX => (OffsetX - (int)OffsetX) * Map.TileSize;
         public float TileOffsetY => (OffsetY - (int)OffsetY) * Map.TileSize;

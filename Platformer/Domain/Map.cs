@@ -7,17 +7,18 @@ namespace Platformer.Domain
     public class Map
     {
         public static int TileSize = 16 * 4;
-        public readonly Point InitialPosition;
+        public readonly Point Start, End;
+        public List<Enemy> Enemies;
         private readonly TileType[,] level;
         private readonly bool[,] isSolid;
-        public List<Enemy> Enemies;
 
 
-        public Map(TileType[,] level, bool[,] isSolid, Point initialPosition, List<Enemy> enemies)
+        public Map(TileType[,] level, bool[,] isSolid, Point start, Point end, List<Enemy> enemies)
         {
             this.level = level;
             this.isSolid = isSolid;
-            InitialPosition = initialPosition;
+            End = end;
+            Start = start;
             Enemies = enemies;
         }
 
@@ -46,6 +47,7 @@ namespace Platformer.Domain
             var level = new TileType[lines[0].Length, lines.Length];
             var isSolid = new bool[lines[0].Length, lines.Length];
             var initialPosition = Point.Empty;
+            var end = Point.Empty;
             for (var y = 0; y < lines.Length; y++)
                 for (var x = 0; x < lines[0].Length; x++)
                 {
@@ -64,12 +66,16 @@ namespace Platformer.Domain
                         case 'E':
                             enemies.Add(new Enemy(x, y));
                             break;
+                        case 'O':
+                            end = new Point(x, y);
+                            level[x, y] = TileType.Exit;
+                            break;
                         default:
                             level[x, y] = TileType.Ground;
                             break;
                     }
                 }
-            return new Map(level, isSolid, initialPosition, enemies);
+            return new Map(level, isSolid, initialPosition, end, enemies);
         }
 
         public bool InBounds(float x, float y)

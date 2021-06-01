@@ -10,17 +10,44 @@ namespace Platformer
 {
     public partial class PlatformerForm : Form
     {
-        private readonly Game game = new Game(LoadLevels().Skip(1).First());
+        private Game game = new Game(LoadLevels().First());
         private readonly Timer timer;
         private readonly Map[] levels = LoadLevels().ToArray();
-        private DateTime lastUpdate = DateTime.MinValue;
-        private readonly Dictionary<string, Bitmap> Assets = Domain.Assets.LoadAssets();
+        private readonly Dictionary<string, Bitmap> assets = Assets.LoadAssets();
+        private Button nextLevelButton, restartButton;
+        private int currentLevel = 1;
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
             DoubleBuffered = true;
-            BackColor = Color.SaddleBrown;
+            ClientSize = new Size(1920 / 2, 1080 / 2);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            //WindowState = FormWindowState.Maximized;
+            nextLevelButton = new Button
+            {
+                Size = new Size(ClientSize.Width, 30),
+                Location = new Point(0, ClientSize.Height - 30),
+                Text = "Next Level",
+                Visible = false,
+            };
+            nextLevelButton.Click += NextLevelButtonClick;
+            restartButton = new Button
+            {
+                Size = new Size(100, 30),
+                Location = new Point(0, 0),
+                Text = "Restart",
+                Visible = false,
+            };
+            restartButton.Click += RestartButton_Click;
+            Controls.Add(nextLevelButton);
+            Controls.Add(restartButton);
+
+        }
+
+        private void RestartButton_Click(object sender, EventArgs e)
+        {
+            game = new Game(LoadLevels().Skip(currentLevel - 1).First());
         }
 
         public PlatformerForm()
@@ -40,7 +67,7 @@ namespace Platformer
         {
             yield return Map.FromLines(Game.MapWithoutWalls);
             yield return Map.FromLines(Game.TestMap);
-            yield return Map.FromLines(Game.TestMap2);
+            yield return Map.FromLines(Game.Level4);
             yield return Map.FromLines(Game.LargeMap);
         }
 
@@ -51,36 +78,48 @@ namespace Platformer
         protected override void OnPaint(PaintEventArgs e)
         {
             game.Update();
+            if (game.GameStage == GameStage.FinishedMap)
+            {
+                DrawMenu();
+                return;
+            }
             base.OnPaint(e);
             var graphics = e.Graphics;
             var map = game.CurrentMap;
             var player = game.Player;
 
-            for (var y = -1; y <= game.Camera.VisibleTilesY; y++)
+            if (player.IsDead)
+            {
+                DrawRestart();
+                return;
+            }
+
+            for (var y = -1; y <= game.Camera.VisibleTilesY + 1; y++)
                 for (var x = -1; x <= game.Camera.VisibleTilesX + 1; x++)
                     switch (map[x + game.Camera.OffsetX, y + game.Camera.OffsetY])
                     {
                         case TileType.Wall:
                             //DrawTile(Brushes.Gray, graphics, x, y);
-                            DrawTile(Assets["wall"], graphics, x, y);
+                            DrawTile(assets["wall"], graphics, x, y);
                             break;
                         case TileType.Ground:
                             //DrawTile(Brushes.Green, graphics, x, y);
-                            DrawTile(Assets["grass"], graphics, x, y);
+                            DrawTile(assets["grass"], graphics, x, y);
                             break;
                         case TileType.Spike:
                             DrawTile(Brushes.Pink, graphics, x, y);
                             break;
+                        case TileType.Exit:
+                            DrawTile(Brushes.Red, graphics, x, y);
+                            break;
                     }
 
-            graphics.DrawLine(new Pen(Color.Black, 10), 1, 1, 50, 50f);
-            //if (player.IsDead)
-            //    Text = "Dead";
-            //else Text = "Alive";
-            DrawCreature(Assets["creature"], graphics, player.PosX, player.PosY);
+            if (player.IsDead)
+                Text = "Dead";
+            else Text = "Alive";
+            DrawCreature(assets["creature"], graphics, player.PosX, player.PosY);
             foreach (var enemy in map.Enemies)
-                DrawCreature(Assets["creature"], graphics, enemy.PosX, enemy.PosY);
-            Text = "EnemyX: " + map.Enemies.First().VelocityX + " EnemyY: " + map.Enemies.First().VelocityY;
+                DrawCreature(assets["creature"], graphics, enemy.PosX, enemy.PosY);
         }
 
         private void DrawCreature(Bitmap bitmap, Graphics graphics, float x, float y)
@@ -110,6 +149,24 @@ namespace Platformer
                 Map.TileSize));
         }
 
+        private void DrawMenu()
+        {
+            nextLevelButton.Visible = true;
+        }
+        private void DrawRestart()
+        {
+            restartButton.Visible = true;
+        }
+
+        private void NextLevelButtonClick(object sender, EventArgs e)
+        {
+            ((Button)sender).Visible = false;
+            if (currentLevel >= levels.Length)
+                currentLevel = 0;
+            game.ChangeMap(LoadLevels().Skip(currentLevel++).FirstOrDefault());
+            game.GameStage = GameStage.Playing;
+        }
+
         protected override void OnKeyDown(KeyEventArgs e)
         {
             var speed = 6f;
@@ -118,10 +175,10 @@ namespace Platformer
             switch (e.KeyCode)
             {
                 case Keys.Q:
-                    Map.TileSize++;
+                    Map.TileSize--;
                     break;
                 case Keys.E:
-                    Map.TileSize--;
+                    Map.TileSize++;
                     break;
                 case Keys.Right:
                     player.VelocityX = speed;
@@ -139,7 +196,7 @@ namespace Platformer
                 case Keys.D2:
                 case Keys.D3:
                 case Keys.D4:
-                    game.ChangeMap(levels[e.KeyValue - 49]);
+                    game.ChangeMap(LoadLevels().ToArray()[e.KeyValue - 49]);
                     break;
             }
         }
