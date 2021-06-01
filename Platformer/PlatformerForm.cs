@@ -72,6 +72,10 @@ namespace Platformer
                             DrawTile(Brushes.Pink, graphics, x, y);
                             break;
                     }
+
+            if (player.IsDead)
+                Text = "Dead";
+            else Text = "Alive";
             DrawCreature(Assets["creature"], graphics, player.PosX, player.PosY);
             foreach (var enemy in map.Enemies)
                 DrawCreature(Assets["creature"], graphics, enemy.PosX, enemy.PosY);
@@ -111,6 +115,12 @@ namespace Platformer
             base.OnKeyDown(e);
             switch (e.KeyCode)
             {
+                case Keys.Q:
+                    Map.TileSize++;
+                    break;
+                case Keys.E:
+                    Map.TileSize--;
+                    break;
                 case Keys.Right:
                     player.VelocityX = speed;
                     break;

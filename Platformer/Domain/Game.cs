@@ -45,8 +45,8 @@ namespace Platformer.Domain
                     enemy.TargetX = Player.PosX;
                     enemy.TargetY = Player.PosY;
                     enemy.MoveToTarget(deltaTime);
-                    if (Math.Abs(Player.PosX - enemy.PosX) < 1e-2
-                        || Math.Abs(Player.PosY - enemy.PosY) < 1e-2)
+                    if (Math.Abs(Player.PosX - enemy.PosX) < Map.TileSize
+                        && Math.Abs(Player.PosY - enemy.PosY) < Map.TileSize)
                         Player.IsDead = true;
                 }
             }
@@ -59,7 +59,7 @@ namespace Platformer.Domain
             "#.................#",
             "#P....#.......#...#",
             "########..###...#.#",
-            "#......#.##...##..#",
+            "#...E..#.##...##..#",
             "#...........###...#",
             "#......#######....#",
             "###################",

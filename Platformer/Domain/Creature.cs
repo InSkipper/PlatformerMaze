@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Platformer.Domain
@@ -83,17 +87,105 @@ namespace Platformer.Domain
 
         public void MoveToTarget(float deltaTime)
         {
-            if (Math.Abs(TargetX - PosX) > 1e-2)
-                VelocityX = (TargetX - PosX) /
-                            (float)Math.Sqrt((TargetX - PosX) *
-                                             (TargetX - PosX));
-            else VelocityX = 0;
-            if (Math.Abs(TargetY - PosY) > 1e-2)
-                VelocityY = (TargetY - PosY) /
-                            (float)Math.Sqrt((TargetY - PosY) *
-                                             (TargetY - PosY));
-            else VelocityY = 0;
+            //if (Math.Abs(TargetX - PosX) > 1e-2)
+            //    VelocityX = (TargetX - PosX) /
+            //                (float)Math.Sqrt((TargetX - PosX) *
+            //                                 (TargetX - PosX));
+            //else VelocityX = 0;
+            //if (Math.Abs(TargetY - PosY) > 1e-2)
+            //    VelocityY = (TargetY - PosY) /
+            //                (float)Math.Sqrt((TargetY - PosY) *
+            //                                 (TargetY - PosY));
+            //else VelocityY = 0;
+            var shortestPath = FindShortestPath(Map, new PointF(PosX, PosY),
+                new[] { new Point((int)TargetX, (int)TargetY) }).FirstOrDefault();
+            if (shortestPath != null)
+            {
+                VelocityX = shortestPath.Reverse().Skip(1).FirstOrDefault().X - PosX;
+                VelocityY = shortestPath.Reverse().Skip(1).FirstOrDefault().Y - PosY;
+            }
+
+            else
+            {
+                VelocityX = 0;
+                VelocityY = 0;
+            }
             MakeMove(VelocityX * deltaTime * 2, VelocityY * deltaTime * 2);
+        }
+
+        public IEnumerable<SinglyLinkedList<PointF>> FindShortestPath(Map map, PointF start, Point[] checkPoints)
+        {
+            var queue = new Queue<SinglyLinkedList<PointF>>();
+            queue.Enqueue(new SinglyLinkedList<PointF>(start));
+            var checkPointsSet = checkPoints.ToHashSet();
+            var visited = new HashSet<Point>();
+
+            while (queue.Count != 0)
+            {
+                var list = queue.Dequeue();
+                var point = list.Value;
+                if (!map.InBounds((int)point.X, (int)point.Y)
+                || visited.Contains(new Point((int)point.X, (int)point.Y))
+                || map[(int)point.X, (int)point.Y] == TileType.Wall)
+                    continue;
+
+                if (checkPointsSet.Contains(new Point((int)point.X, (int)point.Y)))
+                    yield return list;
+                visited.Add(new Point((int)point.X, (int)point.Y));
+                foreach (var nextPoint in point.Neighbors())
+                    queue.Enqueue(new SinglyLinkedList<PointF>(nextPoint, list));
+            }
+        }
+    }
+
+
+
+    public static class PointExtensions
+    {
+        public static IEnumerable<PointF> Neighbors(this PointF point)
+        {
+            return offsets
+                .Select(offset => point + offset);
+        }
+
+        private static readonly HashSet<SizeF> offsets = new HashSet<SizeF>
+        {
+            new SizeF(0, -1),
+            new SizeF(1, 0),
+            new SizeF(-1, 0),
+            new SizeF(1, 1),
+            new SizeF(1, -1),
+            new SizeF(-1, 1),
+            new SizeF(-1, -1),
+            new SizeF(0, 1),
+        };
+    }
+
+    public class SinglyLinkedList<T> : IEnumerable<T>
+    {
+        public readonly T Value;
+        public readonly SinglyLinkedList<T> Previous;
+
+        public SinglyLinkedList(T value, SinglyLinkedList<T> previous = null)
+        {
+            Value = value;
+            Previous = previous;
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            yield return Value;
+            var current = Previous;
+            while (current != null)
+            {
+                yield return current.Value;
+                current = current.Previous;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

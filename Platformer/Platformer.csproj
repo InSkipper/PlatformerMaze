@@ -56,7 +56,6 @@
     <Compile Include="Domain\Dynamic.cs" />
     <Compile Include="Domain\ICreature.cs" />
     <Compile Include="Domain\Creature.cs" />
-    <Compile Include="Domain\Direction.cs" />
     <Compile Include="Domain\Game.cs" />
     <Compile Include="Domain\GameStage.cs" />
     <Compile Include="Domain\Map.cs" />
