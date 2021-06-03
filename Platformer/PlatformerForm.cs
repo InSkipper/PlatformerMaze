@@ -44,7 +44,7 @@ namespace Platformer
             restartButton.Click += RestartButton_Click;
             Controls.Add(nextLevelButton);
             Controls.Add(restartButton);
-            BackgroundImage = new Bitmap(@"C:\Users\User\Desktop\ButtonsTutor.png");
+            BackgroundImage = new Bitmap(@"Sprites\ButtonsTutor.png");
         }
 
         public PlatformerForm()

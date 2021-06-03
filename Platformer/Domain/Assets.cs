@@ -11,9 +11,9 @@ namespace Platformer.Domain
         {
             assetNameToBitmap["wall"]  = new Bitmap(@"Sprites\Walls.png");
             assetNameToBitmap["grass"] = new Bitmap(@"Sprites\Grass.png");
-            assetNameToBitmap["enemy"] = new Bitmap(@"C:\Users\User\Desktop\Skeleton.png");
-            assetNameToBitmap["player"] = new Bitmap(@"C:\Users\User\Desktop\Player2.png");
-            assetNameToBitmap["exit"] = new Bitmap(@"C:\Users\User\Desktop\Exit.png");
+            assetNameToBitmap["enemy"] = new Bitmap(@"Sprites\Skeleton.png");
+            assetNameToBitmap["player"] = new Bitmap(@"Sprites\Player2.png");
+            assetNameToBitmap["exit"] = new Bitmap(@"Sprites\Exit.png");
 
             return assetNameToBitmap;
         }
