@@ -7,7 +7,7 @@ namespace ModelTests
     [TestFixture]
     class PlayerTests
     {
-        private Game game = new Game(Map.FromLines(Game.TestMap));
+        private Game game = new Game(Map.FromLines(Game.Level2));
         private Creature creature;
         private float deltaTime = 1 / 60f;
 

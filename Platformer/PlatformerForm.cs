@@ -16,22 +16,24 @@ namespace Platformer
         private readonly Dictionary<string, Bitmap> assets = Assets.LoadAssets();
         private Button nextLevelButton, restartButton;
         private int currentLevel = 1;
+        private int deathCounter = 0;
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
             DoubleBuffered = true;
             ClientSize = new Size(1920 / 2, 1080 / 2);
-            FormBorderStyle = FormBorderStyle.FixedSingle;
-            //WindowState = FormWindowState.Maximized;
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            MaximizeBox = false;
+
             nextLevelButton = new Button
             {
-                Size = new Size(ClientSize.Width, 30),
-                Location = new Point(0, ClientSize.Height - 30),
+                Size = new Size(ClientSize.Width, 60),
+                Location = new Point(0, ClientSize.Height - 60),
                 Text = "Next Level",
                 Visible = false,
             };
-            nextLevelButton.Click += NextLevelButtonClick;
+            nextLevelButton.Click += NextLevelButton_Click;
             restartButton = new Button
             {
                 Size = new Size(100, 30),
@@ -42,12 +44,7 @@ namespace Platformer
             restartButton.Click += RestartButton_Click;
             Controls.Add(nextLevelButton);
             Controls.Add(restartButton);
-
-        }
-
-        private void RestartButton_Click(object sender, EventArgs e)
-        {
-            game = new Game(LoadLevels().Skip(currentLevel - 1).First());
+            BackgroundImage = new Bitmap(@"C:\Users\User\Desktop\ButtonsTutor.png");
         }
 
         public PlatformerForm()
@@ -65,10 +62,10 @@ namespace Platformer
 
         private static IEnumerable<Map> LoadLevels()
         {
-            yield return Map.FromLines(Game.MapWithoutWalls);
-            yield return Map.FromLines(Game.TestMap);
+            yield return Map.FromLines(Game.Level1);
+            yield return Map.FromLines(Game.Level2);
+            yield return Map.FromLines(Game.Level3);
             yield return Map.FromLines(Game.Level4);
-            yield return Map.FromLines(Game.LargeMap);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -90,6 +87,7 @@ namespace Platformer
 
             if (player.IsDead)
             {
+                game.GameStage = GameStage.Waiting;
                 DrawRestart();
                 return;
             }
@@ -106,20 +104,13 @@ namespace Platformer
                             //DrawTile(Brushes.Green, graphics, x, y);
                             DrawTile(assets["grass"], graphics, x, y);
                             break;
-                        case TileType.Spike:
-                            DrawTile(Brushes.Pink, graphics, x, y);
-                            break;
                         case TileType.Exit:
-                            DrawTile(Brushes.Red, graphics, x, y);
+                            DrawTile(assets["exit"], graphics, x, y);
                             break;
                     }
-
-            if (player.IsDead)
-                Text = "Dead";
-            else Text = "Alive";
-            DrawCreature(assets["creature"], graphics, player.PosX, player.PosY);
+            DrawCreature(assets["player"], graphics, player.PosX, player.PosY);
             foreach (var enemy in map.Enemies)
-                DrawCreature(assets["creature"], graphics, enemy.PosX, enemy.PosY);
+                DrawCreature(assets["enemy"], graphics, enemy.PosX, enemy.PosY);
         }
 
         private void DrawCreature(Bitmap bitmap, Graphics graphics, float x, float y)
@@ -158,17 +149,28 @@ namespace Platformer
             restartButton.Visible = true;
         }
 
-        private void NextLevelButtonClick(object sender, EventArgs e)
+        private void NextLevelButton_Click(object sender, EventArgs e)
         {
             ((Button)sender).Visible = false;
             if (currentLevel >= levels.Length)
                 currentLevel = 0;
             game.ChangeMap(LoadLevels().Skip(currentLevel++).FirstOrDefault());
-            game.GameStage = GameStage.Playing;
+            game.GameStage = GameStage.Waiting;
+        }
+
+        private void RestartButton_Click(object sender, EventArgs e)
+        {
+            if (deathCounter++ == 5)
+            {
+                deathCounter = 0;
+                currentLevel = 1;
+            }
+            game = new Game(LoadLevels().Skip(currentLevel - 1).First());
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
+            game.GameStage = GameStage.Playing;
             var speed = 6f;
             var player = game.Player;
             base.OnKeyDown(e);
@@ -179,6 +181,14 @@ namespace Platformer
                     break;
                 case Keys.E:
                     Map.TileSize++;
+                    break;
+                case Keys.R:
+                    if (deathCounter++ == 5)
+                    {
+                        deathCounter = 0;
+                        currentLevel = 1;
+                    }
+                    game = new Game(LoadLevels().Skip(currentLevel - 1).First());
                     break;
                 case Keys.Right:
                     player.VelocityX = speed;

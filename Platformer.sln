@@ -5,11 +5,6 @@ VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platformer", "Platformer\Platformer.csproj", "{7AAC1DB1-717D-4ACD-AB42-89312FABBB22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModelTests", "ModelTests\ModelTests.csproj", "{BA7F768E-1236-402E-A032-76FB5F2FA8EF}"
-	ProjectSection(ProjectDependencies) = postProject
-		{7AAC1DB1-717D-4ACD-AB42-89312FABBB22} = {7AAC1DB1-717D-4ACD-AB42-89312FABBB22}
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,10 +15,6 @@ Global
 		{7AAC1DB1-717D-4ACD-AB42-89312FABBB22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AAC1DB1-717D-4ACD-AB42-89312FABBB22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7AAC1DB1-717D-4ACD-AB42-89312FABBB22}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BA7F768E-1236-402E-A032-76FB5F2FA8EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BA7F768E-1236-402E-A032-76FB5F2FA8EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BA7F768E-1236-402E-A032-76FB5F2FA8EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BA7F768E-1236-402E-A032-76FB5F2FA8EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

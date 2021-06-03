@@ -14,6 +14,10 @@ namespace Platformer.Domain
             new SizeF(0, speed),
             new SizeF(speed, 0),
             new SizeF(-speed, 0),
+            new SizeF(-speed, -speed),
+            new SizeF(-speed, speed),
+            new SizeF(speed, -speed),
+            new SizeF(speed, speed),
         };
 
         public static IEnumerable<PointF> Neighbors(this PointF point)

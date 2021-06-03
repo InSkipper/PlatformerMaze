@@ -2,8 +2,7 @@
 {
     public enum GameStage
     {
-        MainMenu,
-        ChoosingMap,
+        Waiting,
         Playing,
         FinishedMap
     }
